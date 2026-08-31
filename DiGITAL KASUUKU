@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KASUUKU - Rent in Uganda</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fff7e6;font-family:Arial, sans-serif}header{background:#ff5a00;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}.v{display:none;padding:12px;max-width:700px;margin:auto}.v.a{display:block}.f{width:100%;padding:14px;border:2px solid #ffcc80;border-radius:12px;margin:8px 0;font-size:16px}.c{background:#fff;border-radius:14px;padding:12px;margin:12px 0;box-shadow:0 3px 12px rgba(0,0,0,.12);position:relative}.b{width:100%;padding:14px;border:0;border-radius:12px;background:#ff5a00;color:#fff;font-weight:900;margin-top:10px;font-size:16px}.d{background:#e53935;color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:900}.x{position:absolute;right:8px;top:8px;background:#e53935;color:#fff;border:0;border-radius:50%;width:32px;height:32px;font-weight:900;font-size:18px}.hero{width:100%;height:220px;object-fit:cover;border-radius:14px;margin:10px 0}
+</style>
+</head>
+<body>
+<header><b onclick="G('h')" style="cursor:pointer">🏠 KASUUKU</b><button onclick="G('al')" style="background:#ffbd00;border:0;border-radius:20px;padding:8px 16px;font-weight:900">ADMIN</button></header>
+
+<div id="h" class="v a">
+<img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=80" class="hero" alt="Rental House">
+<h2>Find Your Next Home in Uganda</h2>
+<p style="color:#666;margin-top:-8px">Affordable rentals in Kampala, Wakiso, Mukono & All Uganda</p>
+<div id="stat" style="background:#fff;padding:12px;border-radius:12px;border:2px solid #0d7064;text-align:center;font-weight:900">Loading...</div>
+<div id="adsH"></div>
+<button class="b" onclick="G('l')">🔍 FIND HOUSE</button>
+<button class="b" style="background:#0d7064" onclick="G('lg')">➕ LIST YOUR HOUSE FREE</button>
+<div id="homeList"></div>
+</div>
+
+<div id="l" class="v"><h2>All Houses</h2><input id="q" class="f" placeholder="Search Kampala, Ntinda..." oninput="R()"><div id="lb">Loading...</div><button class="b" style="background:#999" onclick="G('h')">⬅ Home</button></div>
+
+<div id="lg" class="v"><h2>Login to List</h2><input id="n" class="f" placeholder="Your Name"><input id="p" class="f" placeholder="Phone 070..."><input id="w" class="f" type="password" placeholder="Create Password"><button class="b" onclick="L()">LOGIN / REGISTER</button><p id="m" style="color:red;font-weight:bold"></p><button class="b" style="background:#999" onclick="G('h')">Home</button></div>
+
+<div id="ad" class="v"><h2 id="who"></h2><input id="fp" class="f" type="number" placeholder="Price per month UGX"><input id="fl" class="f" placeholder="Location (e.g. Ntinda)"><input id="pi" type="file" accept="image/*" class="f"><img id="pr" style="width:100%;border-radius:12px;display:none;margin-top:8px"><button class="b" onclick="P()">📢 PUBLISH HOUSE</button><h3>Your Houses - You can Delete</h3><div id="my"></div><button class="b" style="background:#999" onclick="G('h')">Logout / Home</button></div>
+
+<div id="al" class="v">
+<h2>Admin Login</h2>
+<input id="ap" class="f" placeholder="Username">
+<input id="aw" class="f" type="password" placeholder="Password">
+<button class="b" onclick="AL()">ENTER ADMIN</button>
+<p id="am" style="color:red;font-weight:900"></p>
+<p style="font-size:12px;color:#888;text-align:center">Default: admin / admin123<br>If forgot, use <b>reset / reset123</b></p>
+</div>
+
+<div id="a" class="v">
+<h2>Admin Panel</h2>
+<input id="oldp" class="f" type="password" placeholder="Old Password">
+<input id="newp" class="f" type="password" placeholder="New Password">
+<button class="b" style="background:#222" onclick="UP()">UPDATE PASSWORD</button>
+<p id="pm" style="font-weight:900"></p>
+<div id="stat2" style="background:#fff;padding:12px;border-radius:12px;border:2px solid #0d7064;text-align:center;font-weight:900;margin:12px 0">Loading...</div>
+<h3>📢 Active Ads <button class="d" onclick="G('ad2')">+ Add</button></h3><div id="adsA"></div>
+<div class="c" style="border:2px solid red"><h3>🏠 Admin - Remove Houses + Search</h3><input id="aq" class="f" placeholder="🔍 Search to delete..." oninput="RA()"><div id="ab">Loading...</div></div>
+<button class="b" style="background:#222" onclick="G('h')">HOME</button>
+</div>
+
+<div id="ad2" class="v"><h2>Add Ad</h2><input id="at" class="f" placeholder="Ad Title"><input id="ai" type="file" accept="image/*" class="f"><img id="apr" style="width:100%;border-radius:12px;display:none"><button class="b" onclick="PA()">Publish Ad</button><button class="b" style="background:#999" onclick="G('a')">Back</button></div>
+
+<script>
+var C={apiKey:"AIzaSyC_ynlX8ovNXfucAnQjvQ4NwPQJKRv0nDk",authDomain:"kasuuku-765cf.firebaseapp.com",databaseURL:"https://kasuuku-765cf-default-rtdb.firebaseio.com",projectId:"kasuuku-765cf"};
+firebase.initializeApp(C);
+var D=firebase.database(),H=[],AD=[],U=null,ADMIN={u:"admin",p:"admin123"};
+try{U=JSON.parse(localStorage.getItem('k_c')||'null');var s=JSON.parse(localStorage.getItem('k_ap')||'null');if(s)ADMIN=s;}catch(e){}
+function G(i){document.querySelectorAll('.v').forEach(v=>v.classList.remove('a'));document.getElementById(i).classList.add('a');R()}
+function L(){var N=n.value.trim(),P=p.value.trim().replace(/\D/g,'').slice(-10),W=w.value.trim(),O={};try{O=JSON.parse(localStorage.getItem('k_u')||'{}')}catch(e){}if(!P||!W){m.innerText='Enter phone + password';return}if(O[P]){if(O[P].pass!=W){m.innerText='Wrong password';return}U=O[P]}else{if(!N){m.innerText='Enter name';return}O[P]={name:N,phone:P,pass:W};localStorage.setItem('k_u',JSON.stringify(O));U=O[P]}localStorage.setItem('k_c',JSON.stringify(U));who.innerText="Hi "+U.name+" - Add House";G('ad');}
+function AL(){
+if(ap.value=='reset' && aw.value=='reset123'){localStorage.removeItem('k_ap');ADMIN={u:'admin',p:'admin123'};am.style.color='green';am.innerText='✅ RESET DONE! Now login with admin / admin123';ap.value='admin';aw.value='';return;}
+if((ap.value===ADMIN.u && aw.value===ADMIN.p) || (ap.value=='admin' && aw.value=='admin123')){G('a');am.innerText='';ap.value='';aw.value='';}
+else{am.style.color='red';am.innerText='Wrong! Use admin / admin123 or reset / reset123';}
+}
+function UP(){if(oldp.value!==ADMIN.p && oldp.value!='admin123'){pm.innerText='Old password wrong';pm.style.color='red';return}if(!newp.value){pm.innerText='Enter new password';return}ADMIN.p=newp.value;localStorage.setItem('k_ap',JSON.stringify(ADMIN));pm.style.color='green';pm.innerText='✅ Updated! New password: '+ADMIN.p;oldp.value='';newp.value='';}
+function X(id,lo,type){var t=type||'houses';if(!confirm('DELETE '+lo+'? Are you sure?'))return;D.ref(t+'/'+id).remove().then(()=>alert('✅ DELETED '+lo));}
+function R(){var s=H.length+' houses | '+AD.length+' ads | All Uganda';try{stat.innerText=s;stat2.innerText=s}catch(e){}var q=(document.getElementById('q').value||'').toLowerCase();var f=H.filter(x=>!q||x.loc.toLowerCase().includes(q));var html=f.map(x=>'<div class=c><img src='+x.photo+' style=width:100%;height:200px;object-fit:cover;border-radius:10px><h3>'+x.loc+'</h3><p><b>UGX '+x.price+'</b> /month</p><p>By '+x.nm+' - '+x.ph+'</p><a href=https://wa.me/256'+x.ph.slice(-9)+' target=_blank style=display:block;background:#0d7064;color:#fff;padding:12px;text-align:center;border-radius:10px;text-decoration:none;font-weight:900>💬 WhatsApp Owner</a></div>').join('')||'<div class=c style=text-align:center;padding:20px><img src=https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&auto=format&fit=crop&q=60 style=width:100%;height:160px;object-fit:cover;border-radius:12px;opacity:0.6><p>No houses found. Be first to list!</p></div>';lb.innerHTML=html;try{homeList.innerHTML=html}catch(e){}if(U){var m2=H.filter(h=>h.ph==U.phone);my.innerHTML=m2.map(x=>'<div class=c style=display:flex;justify-content:space-between;align-items:center><div><b>'+x.loc+'</b><br>UGX '+x.price+'</div><button class=d onclick=X(\''+x.id+'\',\''+x.loc+'\')>DELETE</button></div>').join('')||'<p>No houses</p>';}RA();var ahtml=AD.map(a=>'<div class=c style=display:flex;align-items:center;gap:10px"><img src='+a.photo+' style=width:70px;height:50px;object-fit:cover;border-radius:8px"><b style=flex:1>'+a.title+'</b><button class=x onclick=X(\''+a.id+'\',\''+a.title+'\',\'ads\')>X</button></div>').join('')||'<p>No ads</p>';try{adsA.innerHTML=ahtml;adsH.innerHTML=AD.map(a=>'<div class=c><img src='+a.photo+' style=width:100%;height:120px;object-fit:cover;border-radius:10px><b>'+a.title+'</b></div>').join('')}catch(e){}}
+function RA(){var q=(document.getElementById('aq')?aq.value:'').toLowerCase()||'';var f=H.filter(x=>!q||x.loc.toLowerCase().includes(q));ab.innerHTML=f.map(x=>'<div class=c style=display:flex;gap:10px;align-items:center"><img src='+x.photo+' style=width:60px;height:60px;object-fit:cover;border-radius:8px"><div style=flex:1><b>'+x.loc+'</b><br>UGX '+x.price+'<br><small>'+x.ph+'</small></div><button class=d onclick=X(\''+x.id+'\',\''+x.loc+'\')>DEL</button></div>').join('')||'<p>No houses</p>';}
+var pd=null,adp=null;
+function handleFile(file,cb){if(!file)return;var r=new FileReader();r.onload=ev=>{var im=new Image();im.onload=()=>{var c=document.createElement('canvas'),mx=800,w=im.width,h=im.height;if(w>mx){var k=mx/w;w*=k;h*=k}c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);cb(c.toDataURL('image/jpeg',0.6));};im.src=ev.target.result;};r.readAsDataURL(file);}
+pi.addEventListener('change',e=>{handleFile(e.target.files[0],d=>{pd=d;pr.src=d;pr.style.display='block'})});
+ai.addEventListener('change',e=>{handleFile(e.target.files[0],d=>{adp=d;apr.src=d;apr.style.display='block'})});
+function P(){if(!U)return G('lg');if(!fp.value||!fl.value||!pd){alert('Add price, location, photo');return}var id=Date.now().toString();D.ref('houses/'+id).set({id:id,price:fp.value,loc:fl.value,photo:pd,ph:U.phone,nm:U.name}).then(()=>{alert('✅ Published!');fp.value='';fl.value='';pd=null;pr.style.display='none';G('l')});}
+function PA(){if(!adp||!at.value){alert('Add title + image');return}var id=Date.now().toString();D.ref('ads/'+id).set({id:id,title:at.value,photo:adp}).then(()=>{alert('Ad published');G('a')});}
+D.ref('houses').on('value',s=>{var v=s.val();H=v?Object.values(v).reverse():[];R()});
+D.ref('ads').on('value',s=>{var v=s.val();AD=v?Object.values(v).reverse():[];R()});
+</script>
+</body>
+</html>
