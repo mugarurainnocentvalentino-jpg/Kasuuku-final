@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KASUUKU - Rent in Uganda</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+body{margin:0;background:#fff7e6;font-family:Arial,sans-serif}
+header{background:#ff5a00;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.v{display:none;padding:12px;max-width:600px;margin:auto}
+.v.a{display:block}
+.f{width:100%;padding:14px;border:2px solid #ffcc80;border-radius:10px;margin:8px 0;box-sizing:border-box;font-size:16px}
+.c{background:#fff;border-radius:12px;padding:12px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.b{width:100%;padding:14px;border:0;border-radius:10px;background:#ff5a00;color:#fff;font-weight:900;margin-top:8px;font-size:16px}
+.d{background:#e53935;color:#fff;border:0;border-radius:8px;padding:8px 16px;font-weight:900;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+<b>KASUUKU 🏠</b>
+<button onclick="G('al')" style="background:#ffbd00;border:0;border-radius:20px;padding:8px 14px;font-weight:900">ADMIN</button>
+</header>
+
+<div id="h" class="v a">
+<h2>Find house in Uganda</h2>
+<p><b id="ct">0</b> houses available</p>
+<button class="b" onclick="G('l')">🔍 FIND HOUSE</button>
+<button class="b" style="background:#0d7064" onclick="G('lg')">➕ LIST YOUR HOUSE</button>
+</div>
+
+<div id="l" class="v">
+<h2>All Houses</h2>
+<input id="q" class="f" placeholder="Search location (e.g. Kampala)" oninput="R()">
+<div id="lb">Loading...</div>
+<button class="b" style="background:#999" onclick="G('h')">⬅ Home</button>
+</div>
+
+<div id="lg" class="v">
+<h2>Login to List</h2>
+<input id="n" class="f" placeholder="Your Name">
+<input id="p" class="f" placeholder="Phone (e.g. 0701234567)">
+<input id="w" class="f" type="password" placeholder="Create Password">
+<button class="b" onclick="L()">LOGIN</button>
+<p id="m" style="color:red;font-weight:bold"></p>
+</div>
+
+<div id="ad" class="v">
+<h2 id="who"></h2>
+<input id="fp" class="f" type="number" placeholder="Price per month (UGX)">
+<input id="fl" class="f" placeholder="Location (e.g. Ntinda, Kampala)">
+<input id="pi" type="file" accept="image/*" class="f">
+<img id="pr" style="width:100%;border-radius:10px;display:none;margin-top:8px">
+<button class="b" onclick="P()">📢 PUBLISH HOUSE</button>
+<h3>Your Houses (You can DELETE)</h3>
+<div id="my"></div>
+<button class="b" style="background:#999" onclick="G('h')">Logout / Home</button>
+</div>
+
+<div id="al" class="v">
+<h2>Admin Login</h2>
+<input id="ap" class="f" placeholder="Username" value="admin">
+<input id="aw" class="f" type="password" placeholder="Password">
+<button class="b" onclick="if(ap.value=='admin'&&aw.value=='admin123'){G('a')}else{alert('Wrong! Use admin / admin123')}">ENTER ADMIN</button>
+</div>
+
+<div id="a" class="v">
+<h2>ADMIN - DELETE ANY HOUSE</h2>
+<input id="aq" class="f" placeholder="Search house to delete" oninput="RA()">
+<div id="ab">Loading...</div>
+<button class="b" style="background:#222" onclick="G('h')">HOME</button>
+</div>
+
+<script>
+var C={apiKey:"AIzaSyC_ynlX8ovNXfucAnQjvQ4NwPQJKRv0nDk",authDomain:"kasuuku-765cf.firebaseapp.com",databaseURL:"https://kasuuku-765cf-default-rtdb.firebaseio.com",projectId:"kasuuku-765cf"};
+firebase.initializeApp(C);
+var D=firebase.database(),H=[],U=null;
+try{U=JSON.parse(localStorage.getItem('k_c')||'null')}catch(e){}
+
+function G(i){
+document.querySelectorAll('.v').forEach(v=>v.classList.remove('a'));
+document.getElementById(i).classList.add('a');
+if(i=='ad'&&U)who.innerText="Hi "+U.name;
+R();
+}
+
+function L(){
+var N=n.value.trim(),P=p.value.trim().replace(/\D/g,'').slice(-10),W=w.value.trim(),O={};
+try{O=JSON.parse(localStorage.getItem('k_u')||'{}')}catch(e){}
+if(!P||!W){m.innerText='Enter phone + password';return}
+if(O[P]){if(O[P].pass!=W){m.innerText='Wrong password';return}U=O[P]}
+else{if(!N){m.innerText='Enter name';return}O[P]={name:N,phone:P,pass:W};localStorage.setItem('k_u',JSON.stringify(O));U=O[P]}
+localStorage.setItem('k_c',JSON.stringify(U));
+G('ad');
+}
+
+function X(id,lo){
+if(!confirm('DELETE '+lo+'? Are you sure?'))return;
+D.ref('houses/'+id).remove().then(()=>alert('DELETED '+lo));
+}
+
+function R(){
+try{ct.innerText=H.length}catch(e){}
+var q=(document.getElementById('q').value||'').toLowerCase();
+var f=H.filter(x=>!q||x.loc.toLowerCase().includes(q));
+lb.innerHTML=f.map(x=>'<div class=c><img src='+x.photo+' style=width:100%;height:180px;object-fit:cover;border-radius:8px><h3>'+x.loc+'</h3><p>UGX '+x.price+' /month</p><p>By '+x.nm+'</p><a href=https://wa.me/256'+x.ph.slice(-9)+' target=_blank style=display:block;background:#0d7064;color:#fff;padding:12px;text-align:center;border-radius:8px;text-decoration:none;font-weight:900>💬 WhatsApp '+x.ph+'</a></div>').join('')||'<p>No houses</p>';
+if(U){
+var m2=H.filter(h=>h.ph==U.phone);
+my.innerHTML=m2.map(x=>'<div class=c style=display:flex;justify-content:space-between;align-items:center><span><b>'+x.loc+'</b><br>UGX '+x.price+'</span><button class=d onclick=X(\''+x.id+'\',\''+x.loc+'\')>DELETE</button></div>').join('')||'<p>You have no houses</p>';
+}
+RA();
+}
+
+function RA(){
+var q=(aq.value||'').toLowerCase(),f=H.filter(x=>!q||x.loc.toLowerCase().includes(q));
+ab.innerHTML=f.map(x=>'<div class=c style=display:flex;gap:8px;align-items:center"><img src='+x.photo+' style=width:60px;height:60px;object-fit:cover;border-radius:8px"><div style=flex:1><b>'+x.loc+'</b><br>UGX '+x.price+'<br><small>'+x.ph+'</small></div><button class=d onclick=X(\''+x.id+'\',\''+x.loc+'\')>DEL</button></div>').join('')||'<p>No houses found</p>';
+}
+
+var pd=null;
+pi.addEventListener('change',e=>{
+var file=e.target.files[0];if(!file)return;
+var r=new FileReader();
+r.onload=ev=>{
+var im=new Image();
+im.onload=()=>{
+var c=document.createElement('canvas'),mx=800,w=im.width,h=im.height;
+if(w>mx){var k=mx/w;w*=k;h*=k}
+c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
+pd=c.toDataURL('image/jpeg',0.6);
+pr.src=pd;pr.style.display='block';
+};
+im.src=ev.target.result;
+};
+r.readAsDataURL(file);
+});
+
+function P(){
+if(!U)return G('lg');
+if(!fp.value||!fl.value||!pd){alert('Add price, location and photo');return}
+var id=Date.now().toString();
+D.ref('houses/'+id).set({id:id,price:fp.value,loc:fl.value,photo:pd,ph:U.phone,nm:U.name}).then(()=>{alert('Published!');fp.value='';fl.value='';pd=null;pr.style.display='none';G('l')});
+}
+
+D.ref('houses').on('value',s=>{
+var v=s.val();
+H=v?Object.values(v).reverse():[];
+R();
+});
+</script>
+</body>
+  </html>
