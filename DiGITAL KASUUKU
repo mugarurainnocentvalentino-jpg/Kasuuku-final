@@ -182,4 +182,4 @@ function render(){
         <div class="houseActions">
           <a class="actionBtn callBtn" href="${tel}">📞 Call</a>
           <a class="actionBtn waBtn" href="${w}" target="_blank">💬 WhatsApp</a>
-          <button class="actionBtn reportBtn" onclick="reportHouse('${esc(x.id)}')">🚨 Report</
+          <button class="actionBtn reportBtn" onclick="reportHouse('${esc(x.id)}')">🚨 Report</>
