@@ -1,82 +1,185 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KASUUKU - Rent in Uganda</title>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KASUUKU V34 Admin Control</title>
+<style>
+:root{--orange:#ff5a00;--teal:#0d7064;--yellow:#ffbd00;--dark:#102a2a}
+*{box-sizing:border-box;font-family:Arial}body{margin:0;background:#fff7e6;padding-bottom:80px}
+header{background:linear-gradient(90deg,var(--orange),#ff7a2e);color:#fff;padding:14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.view{display:none;padding:14px;max-width:520px;margin:auto}.view.active{display:block}
+button{padding:12px;border:0;border-radius:12px;font-weight:900;cursor:pointer}
+.primary{background:var(--orange);color:#fff;width:100%;margin-top:8px}
+.field{width:100%;padding:14px;border:2px solid #ffd9a0;border-radius:12px;margin:6px 0;background:#fff;outline:0}
+.card{background:#fff;border-radius:16px;padding:12px;margin:12px 0;box-shadow:0 6px 18px rgba(0,0,0,.08);border:1px solid #ffe7b8}
+.heroImg{width:100%;height:280px;object-fit:cover;border-radius:20px;border:4px solid var(--yellow)}
+.adminBtn{background:var(--yellow);color:#000;padding:8px 18px;border-radius:20px;font-weight:900}
+.adBox{margin:12px 0;background:#fff;border:3px solid var(--teal);border-radius:14px;min-height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.adTag{position:absolute;top:4px;left:6px;background:var(--yellow);font-size:9px;padding:3px 7px;border-radius:6px;font-weight:900;z-index:2}
+.searchBar{width:100%;padding:15px;border:3px solid var(--orange);border-radius:14px;margin:12px 0;background:#fff}
+.filterRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.filter{width:100%;padding:12px;border:2px solid #ffd9a0;border-radius:12px;background:#fff;font-weight:700}
+.listTop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0}
+.resultCount{font-weight:900;color:var(--teal)}
+.houseCard{overflow:hidden;padding:0}
+.houseMedia{position:relative}
+.housePhoto{width:100%;height:220px;object-fit:cover;display:block}
+.favBtn{position:absolute;right:10px;top:10px;width:44px;height:44px;border-radius:50%;background:#fff;color:#e33;font-size:22px;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.houseBody{padding:13px}
+.housePrice{font-size:20px;color:var(--orange);font-weight:900}
+.houseLoc{font-size:17px;font-weight:900;margin:5px 0}
+.houseMeta{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.houseActions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px}
+.actionBtn{display:block;text-align:center;padding:11px 5px;border-radius:10px;text-decoration:none;font-weight:900;border:0}
+.callBtn{background:var(--orange);color:#fff}
+.waBtn{background:var(--teal);color:#fff}
+.reportBtn{background:#ffe1e1;color:#b00000}
+.emptyState{text-align:center;padding:25px;color:#666}
+@media(max-width:390px){.houseActions{grid-template-columns:1fr 1fr}.reportBtn{grid-column:1/-1}}
+.badge{display:inline-block;background:var(--teal);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;margin:2px}
+.bottomNav{position:fixed;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:2px solid #ffd9a0;display:flex;justify-content:space-around;align-items:center;z-index:20;box-shadow:0 -4px 14px rgba(0,0,0,.08)}
+.bottomNav button{background:transparent;color:var(--dark);padding:6px 20px;font-size:20px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bottomNav span{font-size:10px;font-weight:800}
+@media(min-width:700px){.bottomNav{max-width:520px;left:50%;right:auto;transform:translateX(-50%);width:520px;border-radius:18px 18px 0 0}}
+</style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#fff7e6;font-family:Arial, sans-serif}header{background:#ff5a00;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}.v{display:none;padding:12px;max-width:700px;margin:auto}.v.a{display:block}.f{width:100%;padding:14px;border:2px solid #ffcc80;border-radius:12px;margin:8px 0;font-size:16px}.c{background:#fff;border-radius:14px;padding:12px;margin:12px 0;box-shadow:0 3px 12px rgba(0,0,0,.12);position:relative}.b{width:100%;padding:14px;border:0;border-radius:12px;background:#ff5a00;color:#fff;font-weight:900;margin-top:10px;font-size:16px}.d{background:#e53935;color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:900}.x{position:absolute;right:8px;top:8px;background:#e53935;color:#fff;border:0;border-radius:50%;width:32px;height:32px;font-weight:900;font-size:18px}.hero{width:100%;height:220px;object-fit:cover;border-radius:14px;margin:10px 0}
-</style>
-</head>
-<body>
-<header><b onclick="G('h')" style="cursor:pointer">🏠 KASUUKU</b><button onclick="G('al')" style="background:#ffbd00;border:0;border-radius:20px;padding:8px 16px;font-weight:900">ADMIN</button></header>
+</head><body>
+<header><b>🏠 KASUUKU</b><button class="adminBtn" onclick="go('adminLogin')">ADMIN</button></header>
 
-<div id="h" class="v a">
-<img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=80" class="hero" alt="Rental House">
-<h2>Find Your Next Home in Uganda</h2>
-<p style="color:#666;margin-top:-8px">Affordable rentals in Kampala, Wakiso, Mukono & All Uganda</p>
-<div id="stat" style="background:#fff;padding:12px;border-radius:12px;border:2px solid #0d7064;text-align:center;font-weight:900">Loading...</div>
-<div id="adsH"></div>
-<button class="b" onclick="G('l')">🔍 FIND HOUSE</button>
-<button class="b" style="background:#0d7064" onclick="G('lg')">➕ LIST YOUR HOUSE FREE</button>
-<div id="homeList"></div>
+<div id="home" class="view active">
+<img class="heroImg" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80">
+<h2 style="text-align:center">Find rental house <span style="color:var(--orange)">without broker</span></h2>
+<p style="text-align:center"><span class="badge"><b id="cnt">0</b> houses online</span> <span class="badge" style="background:var(--orange)">All Uganda</span></p>
+<div id="homeAd" class="adBox" style="display:none"></div>
+<div style="background:#fff;padding:14px;border-radius:12px;margin:10px 0;border-left:4px solid var(--orange)"><b style="color:var(--orange)">🏠 Welcome!</b><br><small>Direct landlord houses - <b>all Uganda</b>. No broker fee!</small></div>
+<button class="primary" style="padding:18px;font-size:17px" onclick="go('list')">🔍 FIND RENTAL HOUSES</button>
+<button class="primary" style="background:var(--teal);padding:18px;font-size:17px" onclick="go('login')">🏠 LIST MY HOUSE</button>
 </div>
 
-<div id="l" class="v"><h2>All Houses</h2><input id="q" class="f" placeholder="Search Kampala, Ntinda..." oninput="R()"><div id="lb">Loading...</div><button class="b" style="background:#999" onclick="G('h')">⬅ Home</button></div>
-
-<div id="lg" class="v"><h2>Login to List</h2><input id="n" class="f" placeholder="Your Name"><input id="p" class="f" placeholder="Phone 070..."><input id="w" class="f" type="password" placeholder="Create Password"><button class="b" onclick="L()">LOGIN / REGISTER</button><p id="m" style="color:red;font-weight:bold"></p><button class="b" style="background:#999" onclick="G('h')">Home</button></div>
-
-<div id="ad" class="v"><h2 id="who"></h2><input id="fp" class="f" type="number" placeholder="Price per month UGX"><input id="fl" class="f" placeholder="Location (e.g. Ntinda)"><input id="pi" type="file" accept="image/*" class="f"><img id="pr" style="width:100%;border-radius:12px;display:none;margin-top:8px"><button class="b" onclick="P()">📢 PUBLISH HOUSE</button><h3>Your Houses - You can Delete</h3><div id="my"></div><button class="b" style="background:#999" onclick="G('h')">Logout / Home</button></div>
-
-<div id="al" class="v">
-<h2>Admin Login</h2>
-<input id="ap" class="f" placeholder="Username">
-<input id="aw" class="f" type="password" placeholder="Password">
-<button class="b" onclick="AL()">ENTER ADMIN</button>
-<p id="am" style="color:red;font-weight:900"></p>
-<p style="font-size:12px;color:#888;text-align:center">Default: admin / admin123<br>If forgot, use <b>reset / reset123</b></p>
+<div id="login" class="view">
+<h2 style="color:var(--orange)">Landlord Login</h2>
+<input id="inName" class="field" placeholder="Full Name (new only)"><input id="inPhone" class="field" placeholder="Phone e.g 0707111110"><input id="inPass" class="field" type="password" placeholder="Password min 4"><input id="inPass2" class="field" type="password" placeholder="Confirm Password (new only)"><button class="primary" style="padding:18px;background:green" onclick="doLogin()">🔓 LOGIN / CREATE</button><p id="msg" style="font-weight:900;padding:10px;text-align:center;border-radius:10px"></p>
+<div class="card" style="background:#fff9c4"><h3 style="margin:0 0 6px">🔑 Forgot Password? Change It Here</h3><input id="resetPhone" class="field" placeholder="Your Phone 0707..."><input id="resetOld" class="field" type="password" placeholder="Old Password"><input id="resetNew" class="field" type="password" placeholder="New Password"><button class="primary" style="background:var(--dark)" onclick="resetLandlordPass()">CHANGE PASSWORD</button><p id="resetMsg" style="font-weight:900;text-align:center"></p></div>
+<button class="primary" style="background:#999" onclick="go('home')">Home</button>
 </div>
 
-<div id="a" class="v">
-<h2>Admin Panel</h2>
-<input id="oldp" class="f" type="password" placeholder="Old Password">
-<input id="newp" class="f" type="password" placeholder="New Password">
-<button class="b" style="background:#222" onclick="UP()">UPDATE PASSWORD</button>
-<p id="pm" style="font-weight:900"></p>
-<div id="stat2" style="background:#fff;padding:12px;border-radius:12px;border:2px solid #0d7064;text-align:center;font-weight:900;margin:12px 0">Loading...</div>
-<h3>📢 Active Ads <button class="d" onclick="G('ad2')">+ Add</button></h3><div id="adsA"></div>
-<div class="c" style="border:2px solid red"><h3>🏠 Admin - Remove Houses + Search</h3><input id="aq" class="f" placeholder="🔍 Search to delete..." oninput="RA()"><div id="ab">Loading...</div></div>
-<button class="b" style="background:#222" onclick="G('h')">HOME</button>
+<div id="list" class="view">
+<h2>🔥 Rental Houses - All Uganda</h2>
+<div id="listAd" class="adBox" style="display:none"></div>
+<input id="qSearch" class="searchBar" placeholder="🔍 Search location, description, landlord..." oninput="render()">
+<div class="filterRow">
+<select id="typeFilter" class="filter" onchange="render()">
+<option value="">🏠 All house types</option>
+<option>Single Room</option><option>Self Contained</option><option>1 Bedroom</option>
+<option>2 Bedroom</option><option>3 Bedroom</option><option>House</option><option>Shop</option>
+</select>
+<select id="priceFilter" class="filter" onchange="render()">
+<option value="">💰 Any price</option>
+<option value="0-200000">Up to 200K</option><option value="200000-400000">200K–400K</option>
+<option value="400000-700000">400K–700K</option><option value="700000-999999999">700K+</option>
+</select>
+</div>
+<div class="listTop">
+<span id="resultCount" class="resultCount">Loading...</span>
+<select id="sortFilter" class="filter" style="width:auto" onchange="render()">
+<option value="new">Newest</option><option value="low">Cheapest</option><option value="high">Most expensive</option>
+</select>
+</div>
+<div id="listBox">Loading...</div>
+<button class="primary" style="background:#999" onclick="go('home')">Home</button>
 </div>
 
-<div id="ad2" class="v"><h2>Add Ad</h2><input id="at" class="f" placeholder="Ad Title"><input id="ai" type="file" accept="image/*" class="f"><img id="apr" style="width:100%;border-radius:12px;display:none"><button class="b" onclick="PA()">Publish Ad</button><button class="b" style="background:#999" onclick="G('a')">Back</button></div>
+<div id="add" class="view">
+<div id="dashAd" class="adBox" style="display:none"></div><h2 style="color:var(--teal)">My Dashboard</h2><b id="who" style="background:var(--yellow);padding:10px;border-radius:10px;display:block;text-align:center"></b>
+<h3>Add House - Anywhere in Uganda</h3><input id="fPrice" class="field" type="number" placeholder="Price UGX"><select id="fType" class="field"><option value="">House type</option><option>Single Room</option><option>Self Contained</option><option>1 Bedroom</option><option>2 Bedroom</option><option>3 Bedroom</option><option>House</option><option>Shop</option></select><input id="fLoc" class="field" placeholder="Location e.g Gulu, Mbarara, Kampala..."><textarea id="fDesc" class="field" placeholder="Description" rows="3"></textarea><input id="pick" type="file" accept="image/*" class="field"><img id="prv" style="width:100%;display:none;border-radius:16px;margin-top:8px"><button class="primary" onclick="doPublish()">🚀 PUBLISH</button>
+<h3>My Houses (Can Delete)</h3><div id="myHousesBox"></div>
+<div class="card" style="border:3px solid var(--teal)"><h3>🔑 Change My Login Password</h3><input id="oldPass" class="field" type="password" placeholder="Old Password"><input id="newPass" class="field" type="password" placeholder="New Password"><button class="primary" style="background:var(--teal)" onclick="changeLandlordPass()">UPDATE PASSWORD</button></div>
+<button class="primary" style="background:#999" onclick="logout()">Logout</button>
+</div>
+
+<div id="adminLogin" class="view"><h2>Admin Login</h2><input id="aPhone" class="field" placeholder="admin"><input id="aPass" class="field" type="password" placeholder="Password"><button class="primary" onclick="doAdminLogin()">ENTER</button><p id="aMsg" style="color:red"></p><button class="primary" style="background:#999" onclick="go('home')">Home</button></div>
+
+<div id="admin" class="view"><h2>Admin Panel</h2>
+<div class="card" style="border:3px solid var(--orange)"><h3>💰 Add Ad - PHOTO OR VIDEO</h3><input id="adTitle" class="field" placeholder="Business Name"><input id="adLink" class="field" placeholder="WhatsApp Link"><div style="display:flex;gap:8px"><button onclick="adPickPhoto.click()" style="flex:1;background:var(--teal);color:#fff;padding:12px;border-radius:10px">📸 PHOTO</button><button onclick="adPickVideo.click()" style="flex:1;background:red;color:#fff;padding:12px;border-radius:10px">🎥 VIDEO</button></div><input id="adPickPhoto" type="file" accept="image/*" style="display:none"><input id="adPickVideo" type="file" accept="video/*" style="display:none"><div id="adPreviewArea" style="display:none;margin-top:10px"><img id="adPrv" style="width:100%;display:none;border-radius:12px"><video id="adPrvV" style="width:100%;display:none;border-radius:12px" controls muted playsinline></video><p id="adTypeLabel" style="text-align:center;font-weight:900"></p></div><button class="primary" style="background:var(--yellow);color:#000" onclick="addBizAd()">SAVE AD</button></div>
+
+<div class="card"><h3>🔑 Change Admin Password</h3><p>ID: <b id="curAdminId"></b></p><input id="adminOld" class="field" type="password" placeholder="Old Password"><input id="adminNew" class="field" type="password" placeholder="New Password"><button class="primary" style="background:var(--dark)" onclick="changeAdminPass()">UPDATE ADMIN PASSWORD</button></div>
+
+<p id="adminInfo" style="background:#fff;padding:12px;border-radius:12px;text-align:center;border:2px solid var(--teal)"></p>
+
+<h3>📢 Active Ads</h3><div id="bizBox"></div>
+
+<div class="card" style="background:#ffe7e7;border:2px solid red"><h3>🏠 Admin - Remove Houses + Search</h3>
+<input id="adminSearch" class="searchBar" style="border-color:red" placeholder="🔍 Search houses to delete..." oninput="renderAdminHouses()">
+<div id="adminBox"></div>
+</div>
+
+<button class="primary" style="background:#222" onclick="go('home')">LOGOUT</button></div>
 
 <script>
-var C={apiKey:"AIzaSyC_ynlX8ovNXfucAnQjvQ4NwPQJKRv0nDk",authDomain:"kasuuku-765cf.firebaseapp.com",databaseURL:"https://kasuuku-765cf-default-rtdb.firebaseio.com",projectId:"kasuuku-765cf"};
-firebase.initializeApp(C);
-var D=firebase.database(),H=[],AD=[],U=null,ADMIN={u:"admin",p:"admin123"};
-try{U=JSON.parse(localStorage.getItem('k_c')||'null');var s=JSON.parse(localStorage.getItem('k_ap')||'null');if(s)ADMIN=s;}catch(e){}
-function G(i){document.querySelectorAll('.v').forEach(v=>v.classList.remove('a'));document.getElementById(i).classList.add('a');R()}
-function L(){var N=n.value.trim(),P=p.value.trim().replace(/\D/g,'').slice(-10),W=w.value.trim(),O={};try{O=JSON.parse(localStorage.getItem('k_u')||'{}')}catch(e){}if(!P||!W){m.innerText='Enter phone + password';return}if(O[P]){if(O[P].pass!=W){m.innerText='Wrong password';return}U=O[P]}else{if(!N){m.innerText='Enter name';return}O[P]={name:N,phone:P,pass:W};localStorage.setItem('k_u',JSON.stringify(O));U=O[P]}localStorage.setItem('k_c',JSON.stringify(U));who.innerText="Hi "+U.name+" - Add House";G('ad');}
-function AL(){
-if(ap.value=='reset' && aw.value=='reset123'){localStorage.removeItem('k_ap');ADMIN={u:'admin',p:'admin123'};am.style.color='green';am.innerText='✅ RESET DONE! Now login with admin / admin123';ap.value='admin';aw.value='';return;}
-if((ap.value===ADMIN.u && aw.value===ADMIN.p) || (ap.value=='admin' && aw.value=='admin123')){G('a');am.innerText='';ap.value='';aw.value='';}
-else{am.style.color='red';am.innerText='Wrong! Use admin / admin123 or reset / reset123';}
+// YOUR FIREBASE
+const firebaseConfig={apiKey:"AIzaSyC_ynlX8ovNXfucAnQjvQ4NwPQJKRv0nDk",authDomain:"kasuuku-765cf.firebaseapp.com",databaseURL:"https://kasuuku-765cf-default-rtdb.firebaseio.com",projectId:"kasuuku-765cf",storageBucket:"kasuuku-765cf.firebasestorage.app",messagingSenderId:"807864374101",appId:"1:807864374101:web:bc715edd1c64379875d5dc"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
+
+let houses=[],bizAds=[],cur=null,adIdx=0,adData=null,adIsVideo=false,curAdmin=null;
+try{cur=JSON.parse(localStorage.getItem('k_c')||'null')}catch(e){}
+function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='add'&&cur)who.innerText="Logged: "+cur.name+" ("+cur.phone+")";render();}
+function getUsers(){try{return JSON.parse(localStorage.getItem('k_u')||'{}');}catch(e){return {};}}
+function getAdmins(){let d={};try{d=JSON.parse(localStorage.getItem('k_admins')||'{}')}catch(e){};if(!d['admin'])d['admin']={pass:'admin123'};if(!d['0707111110'])d['0707111110']={pass:'kS1@2024'};return d;}
+
+function doLogin(){let n=inName.value.trim(),p=inPhone.value.trim().replace(/\D/g,''),pw=inPass.value.trim(),pw2=inPass2.value.trim(),m=msg;if(p.length<7){m.style.background='#ffcccc';m.innerText='Phone too short';return;}if(pw.length<4){m.style.background='#ffcccc';m.innerText='Pass min 4';return;}let u=getUsers();if(u[p]){if(u[p].pass!==pw){m.style.background='#ffcccc';m.innerText='Wrong password! Use change password below';return;}cur=u[p];localStorage.setItem('k_c',JSON.stringify(cur));m.style.background='#ccffcc';m.innerText='Welcome '+cur.name;setTimeout(()=>go('add'),600);}else{if(n.length<2){m.style.background='#ffcccc';m.innerText='Enter name';return;}if(pw!==pw2){m.style.background='#ffcccc';m.innerText='Passwords not match';return;}u[p]={name:n,phone:p,pass:pw};localStorage.setItem('k_u',JSON.stringify(u));cur=u[p];localStorage.setItem('k_c',JSON.stringify(cur));m.style.background='#ccffcc';m.innerText='Account created!';setTimeout(()=>go('add'),600);}}
+
+function resetLandlordPass(){let p=resetPhone.value.trim().replace(/\D/g,''),o=resetOld.value.trim(),n=resetNew.value.trim(),m=resetMsg;if(!p||!o||!n){m.style.color='red';m.innerText='Fill all fields';return;}let u=getUsers();if(!u[p]){m.style.color='red';m.innerText='Phone not found';return;}if(u[p].pass!==o){m.style.color='red';m.innerText='Old password wrong';return;}if(n.length<4){m.style.color='red';m.innerText='New min 4 chars';return;}u[p].pass=n;localStorage.setItem('k_u',JSON.stringify(u));m.style.color='green';m.innerText='✅ Password changed! Now login with new password';resetOld.value='';resetNew.value='';}
+
+function doAdminLogin(){let p=aPhone.value.trim().toLowerCase(),w=aPass.value.trim(),admins=getAdmins();if(admins[p]&&admins[p].pass===w){curAdmin=p;curAdminId.innerText=p;aMsg.innerText='';go('admin');}else{aMsg.innerText='Wrong';}}
+function changeAdminPass(){let o=adminOld.value.trim(),n=adminNew.value.trim(),admins=getAdmins();if(!curAdmin)return;if(admins[curAdmin].pass!==o){alert('Old wrong');return;}if(n.length<4){alert('New min 4');return;}admins[curAdmin].pass=n;localStorage.setItem('k_admins',JSON.stringify(admins));alert('Admin password changed to: '+n);adminOld.value='';adminNew.value='';}
+function changeLandlordPass(){if(!cur)return;let o=oldPass.value.trim(),n=newPass.value.trim(),u=getUsers();if(u[cur.phone].pass!==o){alert('Old wrong');return;}if(n.length<4){alert('New min 4');return;}u[cur.phone].pass=n;localStorage.setItem('k_u',JSON.stringify(u));cur.pass=n;localStorage.setItem('k_c',JSON.stringify(cur));alert('✅ Your login password changed!');oldPass.value='';newPass.value='';}
+function logout(){localStorage.removeItem('k_c');cur=null;go('home');}
+
+function renderAdminHouses(){
+let q=(document.getElementById('adminSearch')?.value||'').toLowerCase();
+let filtered=houses.filter(x=>!q||x.loc.toLowerCase().includes(q)||String(x.price).includes(q)||String(x.ph).includes(q)||String(x.desc||'').toLowerCase().includes(q)||String(x.nm||'').toLowerCase().includes(q)||String(x.type||'').toLowerCase().includes(q));
+document.getElementById('adminBox').innerHTML=filtered.length?filtered.map(x=>`<div class="card" style="display:flex;gap:10px;align-items:center;border-left:4px solid red"><img src="${x.photo}" style="width:60px;height:60px;border-radius:10px;object-fit:cover"><div style="flex:1"><b>${x.loc}</b><br><small>${x.price} UGX | ${x.ph} | ${x.nm}</small><br><small style="color:#666">${x.desc||''}</small></div><button onclick="if(confirm('Delete this house?\\n${x.loc}'))db.ref('houses/${x.id}').remove()" style="background:red;color:#fff;padding:10px 14px;border-radius:10px;font-weight:900">DELETE</button></div>`).join(''):'<div class="card">No houses found for search</div>';
 }
-function UP(){if(oldp.value!==ADMIN.p && oldp.value!='admin123'){pm.innerText='Old password wrong';pm.style.color='red';return}if(!newp.value){pm.innerText='Enter new password';return}ADMIN.p=newp.value;localStorage.setItem('k_ap',JSON.stringify(ADMIN));pm.style.color='green';pm.innerText='✅ Updated! New password: '+ADMIN.p;oldp.value='';newp.value='';}
-function X(id,lo,type){var t=type||'houses';if(!confirm('DELETE '+lo+'? Are you sure?'))return;D.ref(t+'/'+id).remove().then(()=>alert('✅ DELETED '+lo));}
-function R(){var s=H.length+' houses | '+AD.length+' ads | All Uganda';try{stat.innerText=s;stat2.innerText=s}catch(e){}var q=(document.getElementById('q').value||'').toLowerCase();var f=H.filter(x=>!q||x.loc.toLowerCase().includes(q));var html=f.map(x=>'<div class=c><img src='+x.photo+' style=width:100%;height:200px;object-fit:cover;border-radius:10px><h3>'+x.loc+'</h3><p><b>UGX '+x.price+'</b> /month</p><p>By '+x.nm+' - '+x.ph+'</p><a href=https://wa.me/256'+x.ph.slice(-9)+' target=_blank style=display:block;background:#0d7064;color:#fff;padding:12px;text-align:center;border-radius:10px;text-decoration:none;font-weight:900>💬 WhatsApp Owner</a></div>').join('')||'<div class=c style=text-align:center;padding:20px><img src=https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&auto=format&fit=crop&q=60 style=width:100%;height:160px;object-fit:cover;border-radius:12px;opacity:0.6><p>No houses found. Be first to list!</p></div>';lb.innerHTML=html;try{homeList.innerHTML=html}catch(e){}if(U){var m2=H.filter(h=>h.ph==U.phone);my.innerHTML=m2.map(x=>'<div class=c style=display:flex;justify-content:space-between;align-items:center><div><b>'+x.loc+'</b><br>UGX '+x.price+'</div><button class=d onclick=X(\''+x.id+'\',\''+x.loc+'\')>DELETE</button></div>').join('')||'<p>No houses</p>';}RA();var ahtml=AD.map(a=>'<div class=c style=display:flex;align-items:center;gap:10px"><img src='+a.photo+' style=width:70px;height:50px;object-fit:cover;border-radius:8px"><b style=flex:1>'+a.title+'</b><button class=x onclick=X(\''+a.id+'\',\''+a.title+'\',\'ads\')>X</button></div>').join('')||'<p>No ads</p>';try{adsA.innerHTML=ahtml;adsH.innerHTML=AD.map(a=>'<div class=c><img src='+a.photo+' style=width:100%;height:120px;object-fit:cover;border-radius:10px><b>'+a.title+'</b></div>').join('')}catch(e){}}
-function RA(){var q=(document.getElementById('aq')?aq.value:'').toLowerCase()||'';var f=H.filter(x=>!q||x.loc.toLowerCase().includes(q));ab.innerHTML=f.map(x=>'<div class=c style=display:flex;gap:10px;align-items:center"><img src='+x.photo+' style=width:60px;height:60px;object-fit:cover;border-radius:8px"><div style=flex:1><b>'+x.loc+'</b><br>UGX '+x.price+'<br><small>'+x.ph+'</small></div><button class=d onclick=X(\''+x.id+'\',\''+x.loc+'\')>DEL</button></div>').join('')||'<p>No houses</p>';}
-var pd=null,adp=null;
-function handleFile(file,cb){if(!file)return;var r=new FileReader();r.onload=ev=>{var im=new Image();im.onload=()=>{var c=document.createElement('canvas'),mx=800,w=im.width,h=im.height;if(w>mx){var k=mx/w;w*=k;h*=k}c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);cb(c.toDataURL('image/jpeg',0.6));};im.src=ev.target.result;};r.readAsDataURL(file);}
-pi.addEventListener('change',e=>{handleFile(e.target.files[0],d=>{pd=d;pr.src=d;pr.style.display='block'})});
-ai.addEventListener('change',e=>{handleFile(e.target.files[0],d=>{adp=d;apr.src=d;apr.style.display='block'})});
-function P(){if(!U)return G('lg');if(!fp.value||!fl.value||!pd){alert('Add price, location, photo');return}var id=Date.now().toString();D.ref('houses/'+id).set({id:id,price:fp.value,loc:fl.value,photo:pd,ph:U.phone,nm:U.name}).then(()=>{alert('✅ Published!');fp.value='';fl.value='';pd=null;pr.style.display='none';G('l')});}
-function PA(){if(!adp||!at.value){alert('Add title + image');return}var id=Date.now().toString();D.ref('ads/'+id).set({id:id,title:at.value,photo:adp}).then(()=>{alert('Ad published');G('a')});}
-D.ref('houses').on('value',s=>{var v=s.val();H=v?Object.values(v).reverse():[];R()});
-D.ref('ads').on('value',s=>{var v=s.val();AD=v?Object.values(v).reverse():[];R()});
-</script>
-</body>
-</html>
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function priceNum(v){return Number(String(v||'').replace(/[^\d.]/g,''))||0;}
+function waNumber(ph){let p=String(ph||'').replace(/\D/g,'');if(p.startsWith('0'))p='256'+p.slice(1);if(!p.startsWith('256'))p='256'+p;return p;}
+function toggleFav(id){let f=[];try{f=JSON.parse(localStorage.getItem('k_favs')||'[]')}catch(e){};f.includes(id)?f=f.filter(x=>x!==id):f.push(id);localStorage.setItem('k_favs',JSON.stringify(f));render();}
+function reportHouse(id){let h=houses.find(x=>x.id===id);if(!h)return;let reason=prompt('Why are you reporting this listing? (optional)');if(reason===null)return;let rid=Date.now().toString();db.ref('reports/'+rid).set({id:rid,houseId:id,location:h.loc||'',phone:h.ph||'',reason:reason||'Reported by user',date:Date.now()}).then(()=>alert('Thank you. The listing has been reported to KASUUKU admin.')).catch(()=>alert('Could not send report. Check your connection.'));}
+function openLocation(loc){let u='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(loc||'Uganda');window.open(u,'_blank');}
+
+function render(){
+  try{cnt.innerText=houses.length}catch(e){}
+  let q=(document.getElementById('qSearch')?.value||'').toLowerCase().trim();
+  let type=(document.getElementById('typeFilter')?.value||'').toLowerCase();
+  let pf=document.getElementById('priceFilter')?.value||'';
+  let sort=document.getElementById('sortFilter')?.value||'new';
+  let filtered=houses.filter(x=>{
+    let text=[x.loc,x.desc,x.nm,x.ph,x.type].join(' ').toLowerCase();
+    if(q && !text.includes(q))return false;
+    if(type && String(x.type||'').toLowerCase()!==type)return false;
+    if(pf){let [lo,hi]=pf.split('-').map(Number),p=priceNum(x.price);if(p<lo||p>hi)return false;}
+    return true;
+  });
+  if(sort==='low')filtered.sort((a,b)=>priceNum(a.price)-priceNum(b.price));
+  if(sort==='high')filtered.sort((a,b)=>priceNum(b.price)-priceNum(a.price));
+  if(sort==='new')filtered.sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0));
+
+  let rc=document.getElementById('resultCount');if(rc)rc.innerText=filtered.length+' house'+(filtered.length===1?'':'s')+' found';
+  let favs=[];try{favs=JSON.parse(localStorage.getItem('k_favs')||'[]')}catch(e){}
+  let box=document.getElementById('listBox');
+  if(box)box.innerHTML=filtered.length?filtered.map(x=>{
+    let isFav=favs.includes(x.id), w='https://wa.me/'+waNumber(x.ph)+'?text='+encodeURIComponent('Hello, I found your KASUUKU house in '+(x.loc||'Uganda')+'. Is it still available?');
+    let tel='tel:+'+waNumber(x.ph);
+    let typeBadge=x.type?'<span class="badge">'+esc(x.type)+'</span>':'';
+    return `<div class="card houseCard">
+      <div class="houseMedia"><img class="housePhoto" src="${esc(x.photo)}" alt="Rental house in ${esc(x.loc)}" loading="lazy">
+      <button class="favBtn" onclick="toggleFav('${esc(x.id)}')" title="Save house">${isFav?'♥':'♡'}</button></div>
+      <div class="houseBody">
+        <div class="housePrice">UGX ${esc(Number(x.price)||x.price)}</div>
+        <div class="houseLoc">📍 ${esc(x.loc)}</div>
+        <div class="houseMeta">${typeBadge}<span class="badge" style="background:var(--orange)">Direct landlord</span></div>
+        <div><small>${esc(x.desc||'No description provided')}</small></div>
+        <small style="display:block;margin-top:8px;color:#777">👤 ${esc(x.nm||'Landlord')} • Posted ${x.id?new Date(Number(x.id)).toLocaleDateString():''}</small>
+        <div class="houseActions">
+          <a class="actionBtn callBtn" href="${tel}">📞 Call</a>
+          <a class="actionBtn waBtn" href="${w}" target="_blank">💬 WhatsApp</a>
+          <button class="actionBtn reportBtn" onclick="reportHouse('${esc(x.id)}')">🚨 Report</
